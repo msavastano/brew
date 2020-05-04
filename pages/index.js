@@ -6,6 +6,7 @@ import { Col, FormGroup, Label, Input, Card, CardTitle, CardColumns,CardSubtitle
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Link from 'next/link'
 import { withRedux } from '../lib/redux'
+import { connect } from 'react-redux';
 
 const states = process.env.STATES.split(' ').map((st) => {
   return st.replace('-', ' ')
@@ -14,8 +15,8 @@ export class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      state: states[0],
-      type: "micro",
+      state: props.state,
+      type: props.type,
       brewsList: [],
       br: {}
     };
@@ -28,12 +29,19 @@ export class Index extends Component {
         return call.data
       })
     )
-    const addToStore = [].concat.apply([], allData)
-    dispatch({ type: 'ADD_DATA', payload: addToStore })
+    let addToStore
+    const data = reduxStore.getState().data
+    if (data === null) {
+      addToStore = [].concat.apply([], allData)
+      dispatch({ type: 'ADD_DATA', payload: addToStore })
+    } else {
+      addToStore = data
+    }
     return { brews: addToStore }
   }
 
   handleStateChange = (event) => {
+    this.props.dispatch({ type: 'CHANGE_STATE', payload: event.target.value })
     this.setState({
       state: event.target.value,
     }, () => {
@@ -49,6 +57,7 @@ export class Index extends Component {
   }
 
   handleTypeChange = (event) => {
+    this.props.dispatch({ type: 'CHANGE_TYPE', payload: event.target.value })
     this.setState({
       type: event.target.value,
     }, () => {
@@ -161,6 +170,13 @@ export class Index extends Component {
   }
 }
 
-export default withRedux(Index);
+const mapState = (state) => { 
+  return {
+    state: state.initState,
+    type: state.initType
+  }
+}
 
-// export default withRedux(Index)
+export default withRedux(connect(
+  mapState
+)(Index))
