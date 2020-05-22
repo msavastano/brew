@@ -23,15 +23,16 @@ export class Index extends Component {
   }
   static async getInitialProps({ reduxStore }) {
     const { dispatch } = reduxStore
-    let allData = await Promise.all(
-      states.map( async (el) => {
-        let call = await apiService(`/breweries/search?query=${el}`)
-        return call.data
-      })
-    )
+    
     let addToStore
     const data = reduxStore.getState().data
     if (data === null) {
+      let allData = await Promise.all(
+        states.map( async (el) => {
+          let call = await apiService(`/breweries/search?query=${el}`)
+          return call.data
+        })
+      )
       addToStore = [].concat.apply([], allData)
       dispatch({ type: 'ADD_DATA', payload: addToStore })
     } else {
