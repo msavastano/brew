@@ -26,7 +26,8 @@ export class Index extends Component {
     
     let addToStore
     const data = reduxStore.getState().data
-    if (data === null) {
+    console.log(data)
+    if (!data) {
       let allData = await Promise.all(
         states.map( async (el) => {
           let call = await apiService(`/breweries/search?query=${el}`)
