@@ -26,7 +26,6 @@ export class Index extends Component {
     
     let addToStore
     const data = reduxStore.getState().data
-    console.log(data)
     if (!data) {
       let allData = await Promise.all(
         states.map( async (el) => {
